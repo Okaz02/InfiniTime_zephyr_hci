@@ -997,11 +997,11 @@
 
 /* nRF52 UARTE0 pins (P0.xx) used by the hal_uart port; -1 = not connected */
 #ifndef MYNEWT_VAL_BLE_HCI_UART_TX_PIN
-#define MYNEWT_VAL_BLE_HCI_UART_TX_PIN (20)
+#define MYNEWT_VAL_BLE_HCI_UART_TX_PIN (11)
 #endif
 
 #ifndef MYNEWT_VAL_BLE_HCI_UART_RX_PIN
-#define MYNEWT_VAL_BLE_HCI_UART_RX_PIN (11)
+#define MYNEWT_VAL_BLE_HCI_UART_RX_PIN (20)
 #endif
 
 #ifndef MYNEWT_VAL_BLE_HCI_UART_RTS_PIN
