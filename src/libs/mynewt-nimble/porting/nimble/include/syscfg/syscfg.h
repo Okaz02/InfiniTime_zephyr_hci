@@ -970,6 +970,52 @@
 #define MYNEWT_VAL_BLE_SOCK_USE_TCP (1)
 #endif
 
+/*** @apache-mynewt-nimble/nimble/transport/uart */
+#ifndef MYNEWT_VAL_BLE_HCI_UART_PORT
+#define MYNEWT_VAL_BLE_HCI_UART_PORT (0)
+#endif
+
+#ifndef MYNEWT_VAL_BLE_HCI_UART_BAUD
+#define MYNEWT_VAL_BLE_HCI_UART_BAUD (1000000)
+#endif
+
+#ifndef MYNEWT_VAL_BLE_HCI_UART_DATA_BITS
+#define MYNEWT_VAL_BLE_HCI_UART_DATA_BITS (8)
+#endif
+
+#ifndef MYNEWT_VAL_BLE_HCI_UART_STOP_BITS
+#define MYNEWT_VAL_BLE_HCI_UART_STOP_BITS (1)
+#endif
+
+#ifndef MYNEWT_VAL_BLE_HCI_UART_PARITY
+#define MYNEWT_VAL_BLE_HCI_UART_PARITY (0) /* HAL_UART_PARITY_NONE */
+#endif
+
+#ifndef MYNEWT_VAL_BLE_HCI_UART_FLOW_CTRL
+#define MYNEWT_VAL_BLE_HCI_UART_FLOW_CTRL (1) /* HAL_UART_FLOW_CTL_RTS_CTS */
+#endif
+
+/* nRF52 UARTE0 pins (P0.xx) used by the hal_uart port; -1 = not connected */
+#ifndef MYNEWT_VAL_BLE_HCI_UART_TX_PIN
+#define MYNEWT_VAL_BLE_HCI_UART_TX_PIN (20)
+#endif
+
+#ifndef MYNEWT_VAL_BLE_HCI_UART_RX_PIN
+#define MYNEWT_VAL_BLE_HCI_UART_RX_PIN (11)
+#endif
+
+#ifndef MYNEWT_VAL_BLE_HCI_UART_RTS_PIN
+#define MYNEWT_VAL_BLE_HCI_UART_RTS_PIN (27)
+#endif
+
+#ifndef MYNEWT_VAL_BLE_HCI_UART_CTS_PIN
+#define MYNEWT_VAL_BLE_HCI_UART_CTS_PIN (17)
+#endif
+
+#ifndef MYNEWT_VAL_BLE_HCI_UART_IRQ_PRIO
+#define MYNEWT_VAL_BLE_HCI_UART_IRQ_PRIO (3)
+#endif
+
 /*** newt */
 #ifndef MYNEWT_VAL_APP_NAME
 #define MYNEWT_VAL_APP_NAME ("dummy_app")
@@ -1021,7 +1067,7 @@
 
 /*** @apache-mynewt-nimble/nimble/controller */
 #ifndef MYNEWT_VAL_BLE_CONTROLLER
-#define MYNEWT_VAL_BLE_CONTROLLER (1)
+#define MYNEWT_VAL_BLE_CONTROLLER (0)
 #endif
 
 #ifndef MYNEWT_VAL_BLE_DEVICE

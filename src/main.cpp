@@ -8,15 +8,13 @@
 // nimble
 #define min // workaround: nimble's min/max macros conflict with libstdc++
 #define max
-#include <controller/ble_ll.h>
 #include <host/ble_hs.h>
 #include <host/util/util.h>
 #include <nimble/nimble_port.h>
 #include <nimble/nimble_port_freertos.h>
 #include <nimble/npl_freertos.h>
-#include <os/os_cputime.h>
 #include <services/gap/ble_svc_gap.h>
-#include <transport/ram/ble_hci_ram.h>
+#include <transport/uart/ble_hci_uart.h>
 #undef max
 #undef min
 
@@ -212,42 +210,14 @@ void SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQHandler(void) {
   }
 }
 
-static void (*radio_isr_addr)();
-static void (*rng_isr_addr)();
-static void (*rtc0_isr_addr)();
-
-/* Some interrupt handlers required for NimBLE radio driver */
 extern "C" {
-void RADIO_IRQHandler(void) {
-  ((void (*)()) radio_isr_addr)();
-}
-
-void RNG_IRQHandler(void) {
-  ((void (*)()) rng_isr_addr)();
-}
-
-void RTC0_IRQHandler(void) {
-  ((void (*)()) rtc0_isr_addr)();
-}
-
 void WDT_IRQHandler(void) {
   nrf_wdt_event_clear(NRF_WDT_EVENT_TIMEOUT);
 }
 
-void npl_freertos_hw_set_isr(int irqn, void (*addr)()) {
-  switch (irqn) {
-    case RADIO_IRQn:
-      radio_isr_addr = addr;
-      break;
-    case RNG_IRQn:
-      rng_isr_addr = addr;
-      break;
-    case RTC0_IRQn:
-      rtc0_isr_addr = addr;
-      break;
-    default:
-      break;
-  }
+void npl_freertos_hw_set_isr(int /*irqn*/, void (* /*addr*/)()) {
+  // The BLE controller runs on an external chip (HCI over UART), so NimBLE
+  // does not need any radio/RNG/RTC0 interrupt here.
 }
 
 uint32_t npl_freertos_hw_enter_critical(void) {
@@ -288,18 +258,8 @@ void nimble_port_init(void) {
   ble_hs_init();
   ble_store_ram_init();
 
-  int res = hal_timer_init(5, nullptr);
-  ASSERT(res == 0);
-  res = os_cputime_init(32768);
-  ASSERT(res == 0);
-  ble_ll_init();
-  ble_hci_ram_init();
+  ble_hci_uart_init();
   nimble_port_freertos_init(BleHost);
-}
-
-void nimble_port_ll_task_func(void* args) {
-  extern void ble_ll_task(void*);
-  ble_ll_task(args);
 }
 }
 
