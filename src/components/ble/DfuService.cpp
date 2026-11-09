@@ -383,18 +383,23 @@ void DfuService::DfuImage::Append(uint8_t* data, size_t size) {
   std::memcpy(tempBuffer + bufferWriteIndex, data, size);
   bufferWriteIndex += size;
 
+  bool imageCompleted = false;
   if (bufferWriteIndex == bufferSize) {
     spiNorFlash.Write(writeOffset + totalWriteIndex, tempBuffer, bufferWriteIndex);
     totalWriteIndex += bufferWriteIndex;
     bufferWriteIndex = 0;
+    imageCompleted = totalWriteIndex == totalSize;
   }
 
   if (bufferWriteIndex > 0 && totalWriteIndex + bufferWriteIndex == totalSize) {
     spiNorFlash.Write(writeOffset + totalWriteIndex, tempBuffer, bufferWriteIndex);
     totalWriteIndex += bufferWriteIndex;
-    if (totalSize < maxSize)
-      WriteMagicNumber();
+    bufferWriteIndex = 0;
+    imageCompleted = true;
   }
+
+  if (imageCompleted && totalSize < maxSize)
+    WriteMagicNumber();
 }
 
 void DfuService::DfuImage::WriteMagicNumber() {
