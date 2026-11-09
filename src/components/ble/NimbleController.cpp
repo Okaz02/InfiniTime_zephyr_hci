@@ -1,6 +1,7 @@
 #include "components/ble/NimbleController.h"
 #include <cstring>
 
+#include <nrf.h>
 #include <nrf_log.h>
 #define min // workaround: nimble's min/max macros conflict with libstdc++
 #define max
@@ -8,8 +9,6 @@
 #include <host/ble_hs.h>
 #include <host/ble_hs_id.h>
 #include <host/util/util.h>
-#include <controller/ble_ll.h>
-#include <controller/ble_hw.h>
 #include <services/gap/ble_svc_gap.h>
 #include <services/gatt/ble_svc_gatt.h>
 #undef max
@@ -21,6 +20,24 @@
 #include "systemtask/SystemTask.h"
 
 using namespace Pinetime::Controllers;
+
+namespace {
+  // The BLE controller runs on an external chip (HCI over UART), so ble_ll_rand() is not
+  // available anymore. Use the nRF52 hardware RNG directly instead.
+  uint32_t HardwareRandom() {
+    uint32_t value = 0;
+    NRF_RNG->CONFIG = RNG_CONFIG_DERCEN_Enabled << RNG_CONFIG_DERCEN_Pos;
+    NRF_RNG->TASKS_START = 1;
+    for (int i = 0; i < 4; i++) {
+      NRF_RNG->EVENTS_VALRDY = 0;
+      while (NRF_RNG->EVENTS_VALRDY == 0) {
+      }
+      value = (value << 8) | NRF_RNG->VALUE;
+    }
+    NRF_RNG->TASKS_STOP = 1;
+    return value;
+  }
+}
 
 NimbleController::NimbleController(Pinetime::System::SystemTask& systemTask,
                                    Ble& bleController,
@@ -302,7 +319,7 @@ int NimbleController::OnGAPEvent(ble_gap_event* event) {
          */
         uint32_t passkey_rand;
         do {
-          passkey_rand = ble_ll_rand();
+          passkey_rand = HardwareRandom();
         } while (passkey_rand > 4293999999);
         pkey.passkey = passkey_rand % 1000000;
 

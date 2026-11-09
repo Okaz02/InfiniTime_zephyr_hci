@@ -136,32 +136,13 @@ set(NIMBLE_SRC
         libs/mynewt-nimble/nimble/host/src/ble_hs_startup.c
         libs/mynewt-nimble/nimble/host/store/ram/src/ble_store_ram.c
         libs/mynewt-nimble/nimble/host/src/ble_monitor.c
-        libs/mynewt-nimble/nimble/transport/ram/src/ble_hci_ram.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_rand.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_conn.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_ctrl.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_hci.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_conn_hci.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_utils.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_scan.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_whitelist.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_adv.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_sched.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_supp_cmd.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_hci_ev.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_rfmgmt.c
-        libs/mynewt-nimble/nimble/controller/src/ble_ll_resolv.c
-        libs/mynewt-nimble/porting/nimble/src/os_cputime.c
-        libs/mynewt-nimble/porting/nimble/src/os_cputime_pwr2.c
+        libs/mynewt-nimble/nimble/transport/uart/src/ble_hci_uart.c
         libs/mynewt-nimble/porting/nimble/src/os_mbuf.c
         libs/mynewt-nimble/porting/nimble/src/os_mempool.c
-        libs/mynewt-nimble/porting/nimble/src/hal_timer.c
+        libs/mynewt-nimble/porting/nimble/src/hal_uart.c
         libs/mynewt-nimble/porting/nimble/src/mem.c
         libs/mynewt-nimble/porting/nimble/src/endian.c
         libs/mynewt-nimble/porting/nimble/src/os_msys_init.c
-        libs/mynewt-nimble/nimble/drivers/nrf52/src/ble_hw.c
-        libs/mynewt-nimble/nimble/drivers/nrf52/src/ble_phy.c
         libs/mynewt-nimble/nimble/host/services/gap/src/ble_svc_gap.c
         libs/mynewt-nimble/nimble/host/services/gatt/src/ble_svc_gatt.c
         libs/mynewt-nimble/nimble/host/util/src/addr.c
@@ -698,9 +679,7 @@ include_directories(SYSTEM
         libs/mynewt-nimble/nimble/include
         libs/mynewt-nimble/porting/nimble/include
         libs/mynewt-nimble/nimble/host/include
-        libs/mynewt-nimble/nimble/controller/include
-        libs/mynewt-nimble/nimble/transport/ram/include
-        libs/mynewt-nimble/nimble/drivers/nrf52/include
+        libs/mynewt-nimble/nimble/transport/uart/include
         libs/mynewt-nimble/ext/tinycrypt/include
         libs/mynewt-nimble/nimble/host/services/gap/include
         libs/mynewt-nimble/nimble/host/services/gatt/include
@@ -790,8 +769,21 @@ set(RELEASE_FLAGS -Os)
 set(CXX_FLAGS -fno-rtti)
 set(ASM_FLAGS -x assembler-with-cpp)
 add_definitions(-DCONFIG_GPIO_AS_PINRESET)
-add_definitions(-DNIMBLE_CFG_CONTROLLER)
 add_definitions(-DOS_CPUTIME_FREQ)
+
+# NimBLE HCI over UART (H4) to an external controller (e.g. Zephyr hci_uart)
+set(BLE_HCI_UART_BAUD 1000000 CACHE STRING "HCI UART baudrate")
+set(BLE_HCI_UART_FLOW_CTRL 1 CACHE STRING "HCI UART flow control (0: none, 1: RTS/CTS)")
+set(BLE_HCI_UART_TX_PIN 11 CACHE STRING "HCI UART TX pin (P0.xx)")
+set(BLE_HCI_UART_RX_PIN 20 CACHE STRING "HCI UART RX pin (P0.xx)")
+set(BLE_HCI_UART_RTS_PIN 27 CACHE STRING "HCI UART RTS pin (P0.xx, -1 if unused)")
+set(BLE_HCI_UART_CTS_PIN 17 CACHE STRING "HCI UART CTS pin (P0.xx, -1 if unused)")
+add_definitions(-DMYNEWT_VAL_BLE_HCI_UART_BAUD=${BLE_HCI_UART_BAUD})
+add_definitions(-DMYNEWT_VAL_BLE_HCI_UART_FLOW_CTRL=${BLE_HCI_UART_FLOW_CTRL})
+add_definitions(-DMYNEWT_VAL_BLE_HCI_UART_TX_PIN=${BLE_HCI_UART_TX_PIN})
+add_definitions(-DMYNEWT_VAL_BLE_HCI_UART_RX_PIN=${BLE_HCI_UART_RX_PIN})
+add_definitions(-DMYNEWT_VAL_BLE_HCI_UART_RTS_PIN=${BLE_HCI_UART_RTS_PIN})
+add_definitions(-DMYNEWT_VAL_BLE_HCI_UART_CTS_PIN=${BLE_HCI_UART_CTS_PIN})
 add_definitions(-DNRF52 -DNRF52832 -DNRF52832_XXAA -DNRF52_PAN_74 -DNRF52_PAN_64 -DNRF52_PAN_12 -DNRF52_PAN_58 -DNRF52_PAN_54 -DNRF52_PAN_31 -DNRF52_PAN_51 -DNRF52_PAN_36 -DNRF52_PAN_15 -DNRF52_PAN_20 -DNRF52_PAN_55 -DBOARD_PCA10040)
 add_definitions(-DFREERTOS)
 add_definitions(-D__STACK_SIZE=1024)

@@ -24,11 +24,8 @@
 #include <stdint.h>
 #include "sysinit/sysinit.h"
 #include "syscfg/syscfg.h"
-#include "os/os_cputime.h"
-#include "bsp/bsp.h"
 #include "os/os.h"
 #include "mem/mem.h"
-#include "hal/hal_gpio.h"
 #include "hal/hal_uart.h"
 
 /* BLE */
@@ -1177,9 +1174,10 @@ ble_hci_uart_init(void)
                          "ble_hci_uart_pkt_pool");
     SYSINIT_PANIC_ASSERT(rc == 0);
 
-    rc = ble_hci_uart_config();
-    SYSINIT_PANIC_ASSERT_MSG(rc == 0, "Failure configuring UART HCI");
-
+    /* Initialize state before the UART starts receiving */
     memset(&ble_hci_uart_state, 0, sizeof ble_hci_uart_state);
     STAILQ_INIT(&ble_hci_uart_state.tx_pkts);
+
+    rc = ble_hci_uart_config();
+    SYSINIT_PANIC_ASSERT_MSG(rc == 0, "Failure configuring UART HCI");
 }
